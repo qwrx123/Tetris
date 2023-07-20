@@ -14,8 +14,7 @@
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PWSTR pCmdLine, _In_ int nCmdShow)
 {
     TetrisWindow win;
-    win.test();
-    win.test2();
+
     if (!win.Create(L"Tetris", WS_OVERLAPPEDWINDOW))
     {
         return 0;
@@ -24,7 +23,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PWSTR pCm
     ShowWindow(win.Window(), nCmdShow);
 
     win.forceRender();
-    //scene myScene = scene(win.Window());
+
     // Run the message loop.
 
     MSG msg = { };

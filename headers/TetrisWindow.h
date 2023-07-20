@@ -12,7 +12,8 @@ class TetrisWindow : public BaseWindow<TetrisWindow>
 {
 public:
     TetrisWindow();
-
+    ~TetrisWindow();
+    
     BOOL Create(
 		PCWSTR lpWindowName,
     	DWORD dwStyle,
@@ -26,7 +27,6 @@ public:
         );
 
     bool forceRender();
-    bool test2();
 
     PCWSTR  ClassName() const;
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);

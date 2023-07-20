@@ -27,8 +27,6 @@ public:
         HMENU hMenu = 0
     );
 
-    BOOL test();
-
     HWND Window() const;
 
 protected:

@@ -12,7 +12,12 @@
 
 TetrisWindow::TetrisWindow()
 {
-    //myScene = scene(m_hwnd);
+
+}
+
+TetrisWindow::~TetrisWindow()
+{
+	delete myScene;
 }
 
 LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -43,11 +48,6 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
     }
     return TRUE;
-}
-
-bool TetrisWindow::test2()
-{
-return false;
 }
 
 bool TetrisWindow::forceRender()

@@ -69,12 +69,6 @@ BOOL BaseWindow<DERIVED_TYPE>::Create(
     return (m_hwnd ? TRUE : FALSE);
 }
 
-template <class DERIVED_TYPE>
-BOOL BaseWindow<DERIVED_TYPE>::test()
-{
-    return false;
-}
-
 template <class DERIVED_TYPE> 
 HWND BaseWindow<DERIVED_TYPE>::Window() const 
 {
