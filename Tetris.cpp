@@ -5,6 +5,7 @@
 #include <windows.h>
 #include "headers/BaseWindow.h"
 #include "headers/TetrisWindow.h"
+#include "headers/scene.h"
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Winmm.lib")
 
@@ -22,15 +23,23 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PWSTR pCm
 
     ShowWindow(win.Window(), nCmdShow);
 
+    win.forceRender();
+    //scene myScene = scene(win.Window());
     // Run the message loop.
 
     MSG msg = { };
-    while (GetMessage(&msg, NULL, 0, 0))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+	while (TRUE)
+	{
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT) {
+				return 0;
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+            win.forceRender();
+		}
     }
-
     return 0;
 }
 
