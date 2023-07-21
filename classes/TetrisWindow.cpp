@@ -39,8 +39,7 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			GetClientRect(m_hwnd, &rc);
 
-			D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-			myScene->resize(size);
+			myScene->resize(rc);
 
 			return 0;
 		}

@@ -3,6 +3,7 @@
 #endif 
 
 #include "../headers/scene.h"
+#include "../headers/block.h"
 
 scene::scene(HWND hwnd)
 {
@@ -22,8 +23,7 @@ scene::scene(HWND hwnd)
             D2D1::HwndRenderTargetProperties(parentHwnd, size),
             &pRenderTarget);
 
-        pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &temppBlackBrush);
-        pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &temppWhiteBrush);
+        pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &pWhiteBrush);
     }
 }
 
@@ -33,36 +33,33 @@ scene::~scene()
     pRenderTarget->Release();
 }
 
-bool scene::render() {
-    pRenderTarget->BeginDraw();
-    RECT rc;
-    GetClientRect(parentHwnd, &rc);
-        
-    D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
+void scene::clearScene()
+{
+	RECT rc;
+	GetClientRect(parentHwnd, &rc);
 
 	pRenderTarget->FillRectangle(
-		D2D1::RectF(
-			rc.left * 1.0f,
-			rc.top * 1.0f,
-			rc.right * 1.0f,
-			rc.bottom * 1.0f),
-		temppWhiteBrush
-	);
-
-    pRenderTarget->DrawRectangle(
 	D2D1::RectF(
-		rc.right * 0.25f,
-		rc.bottom * 0.4f,
-		rc.right * 0.75f,
-		rc.bottom * 0.75f),
-	temppBlackBrush,
-	2.0,
-	NULL);
+		rc.left * 1.0f,
+		rc.top * 1.0f,
+		rc.right * 1.0f,
+		rc.bottom * 1.0f),
+	pWhiteBrush
+	);
+}
+bool scene::render()
+{
+    pRenderTarget->BeginDraw();
+
+	clearScene();
 
     pRenderTarget->EndDraw();
     return true;
 }
 
-bool scene::resize(D2D1_SIZE_U size) {
-    return SUCCEEDED(pRenderTarget->Resize(size));
+bool scene::resize(RECT size)
+{
+    D2D1_SIZE_U newSize = D2D1::SizeU(size.right, size.bottom);
+
+    return SUCCEEDED(pRenderTarget->Resize(newSize));
 }

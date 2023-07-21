@@ -9,17 +9,22 @@
 
 #pragma comment(lib, "d2d1.lib")
 
+#include "block.h"
+
 class scene
 {
 public:
     scene(HWND hwnd);
     ~scene();
-    bool resize(D2D1_SIZE_U size);
+    bool resize(RECT size);
     bool render();
+private:
+    void clearScene();
 private:
     HWND parentHwnd;
     ID2D1Factory* pD2DFactory;
     ID2D1HwndRenderTarget* pRenderTarget;
-    ID2D1SolidColorBrush* temppBlackBrush = NULL;
-    ID2D1SolidColorBrush* temppWhiteBrush = NULL;
+    ID2D1SolidColorBrush* pWhiteBrush = NULL;
+    
+    int sceneSize;
 };
