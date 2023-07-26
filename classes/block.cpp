@@ -1,8 +1,8 @@
 #include "../headers/block.h"
 
 
-block::block(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize) 
-	: pRenderTarget(renderTarget), currentColor(block::colors::white), screen(screenSize), coordinates(setLocation)
+block::block(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, block::style myStyle) 
+	: pRenderTarget(renderTarget), currentColor(block::colors::white), screen(screenSize), coordinates(setLocation), myStyle(myStyle)
 {
 	for (int i = 0; i < block::colors::count; i++)
 	{
@@ -46,11 +46,18 @@ void block::resetRect() {
 }
 
 bool block::render() {
-
-	pRenderTarget->FillRectangle(
-		drawnRect,
-		paintColor[currentColor]
-	);
+	if (myStyle != style::onlyBoarder)
+	{
+		pRenderTarget->FillRectangle(
+			drawnRect,
+			paintColor[currentColor]
+		);
+	}
+	
+	if (myStyle == style::boarderless)
+	{
+		return true;
+	}
 
     pRenderTarget->DrawRectangle(
 	drawnRect,

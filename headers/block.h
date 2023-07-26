@@ -22,6 +22,12 @@ public:
 		orange,
 		count
 	};
+	enum style
+	{
+		boarder,
+		boarderless,
+		onlyBoarder
+	};
 	struct location
 	{
 		float top;
@@ -30,20 +36,21 @@ public:
 		float height;
 	};
 	
-private:
+protected:
 	ID2D1HwndRenderTarget* pRenderTarget;
 	block::colors currentColor;
 	ID2D1SolidColorBrush* paintColor[colors::count];
 	block::location coordinates;
+	block::style myStyle;
 	RECT screen;
 	D2D1_RECT_F drawnRect;
 public:
-	block(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize);
+	block(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, block::style myStyle = block::style::boarder);
 	~block();
 	bool changeColor(block::colors);
-	bool resize(RECT newScreen);
-	bool render();
-private: 
+	virtual bool resize(RECT newScreen);
+	virtual bool render();
+protected: 
 	void resetRect();
 	bool createColor(block::colors createColor);
 };

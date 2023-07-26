@@ -43,6 +43,13 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			return 0;
 		}
+	case WM_GETMINMAXINFO:
+		{
+			LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+			lpMMI->ptMinTrackSize.x = 300;
+			lpMMI->ptMinTrackSize.y = 300;
+			return 0;
+		}
     default:
         return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
     }
