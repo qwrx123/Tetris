@@ -4,7 +4,7 @@ const WCHAR textBox::msc_fontName[8] = L"Verdana";
 
 textBox::textBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, 
     IDWriteFactory* pDWriteFactory, const wchar_t myText[], block::style myStyle)
-: block(renderTarget, setLocation, screenSize, myStyle), boxText(myText), stringLength(wcsnlen(myText, 100)),
+: block(renderTarget, setLocation, screenSize, myStyle), boxText(myText), stringLength(wcsnlen(myText, 1000)),
 origin(D2D1_POINT_2F{screenSize.right * coordinates.left, screenSize.bottom * coordinates.top})
 {
     
@@ -34,8 +34,14 @@ origin(D2D1_POINT_2F{screenSize.right * coordinates.left, screenSize.bottom * co
 
 textBox::~textBox()
 {
-    pTextFormat->Release();
-    pTextLayout->Release();
+    if (pTextFormat)
+    {
+        pTextFormat->Release();
+    }
+    if (pTextLayout)
+    {
+        pTextLayout->Release();
+    }
 }
 
 bool textBox::render()
@@ -78,7 +84,7 @@ bool textBox::textSizeFit()
     
     DWRITE_TEXT_METRICS metrics;
     pTextLayout->GetMetrics(&metrics);
-    float margin = metrics.layoutHeight*0.1;
+    float margin = (metrics.layoutHeight < metrics.layoutWidth) ? metrics.layoutHeight*0.1 : metrics.layoutWidth*0.1;
 
     DWRITE_OVERHANG_METRICS overhangs;
     pTextLayout->GetOverhangMetrics(&overhangs);

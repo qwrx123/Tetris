@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.tpp": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "stdexcept": "cpp"
     }
 }

@@ -6,7 +6,10 @@
 
 #include "../headers/BaseWindow.h"
 
+#include <Windowsx.h>
 #include <windows.h>
+#include <D2d1.h>
+
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Winmm.lib")
 
@@ -25,31 +28,42 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-
+    PostQuitMessage(0);
+    return 0;
     case WM_PAINT:
-        {
-			myScene->render();
-        }
+    {
+		myScene->render();
         return 0;
+    }
 	case WM_SIZE:
-		{
-			RECT rc;
+	{
+		RECT rc;
 
-			GetClientRect(m_hwnd, &rc);
+		GetClientRect(m_hwnd, &rc);
 
-			myScene->resize(rc);
+		myScene->resize(rc);
 
-			return 0;
-		}
+		return 0;
+	}
 	case WM_GETMINMAXINFO:
-		{
-			LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-			lpMMI->ptMinTrackSize.x = 300;
-			lpMMI->ptMinTrackSize.y = 300;
-			return 0;
-		}
+	{
+		LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+		lpMMI->ptMinTrackSize.x = 300;
+		lpMMI->ptMinTrackSize.y = 300;
+		return 0;
+	}
+	case WM_LBUTTONUP:
+	{
+		D2D1_POINT_2F clickPoint{(float)GET_X_LPARAM(lParam), (float)GET_Y_LPARAM(lParam)};
+		myScene->onClick(clickPoint);
+		return 0;
+	}
+	case WM_MOUSEMOVE:
+	{
+		D2D1_POINT_2F movePoint{(float)GET_X_LPARAM(lParam), (float)GET_Y_LPARAM(lParam)};
+		myScene->onMove(movePoint);
+		return 0;
+	}
     default:
         return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
     }

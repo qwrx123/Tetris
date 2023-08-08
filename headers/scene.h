@@ -12,12 +12,14 @@
 #pragma comment(lib, "dwrite.lib")
 
 #include "block.h"
+#include "clickableTextBox.h"
 
 class scene
 {
 public:
     enum screen
     {
+        invalid = -1,
         Title,
         Game,
         Death,
@@ -30,7 +32,11 @@ private:
     IDWriteFactory* pDWriteFactory;
     ID2D1HwndRenderTarget* pRenderTarget;
     block** renderables;
-    int sceneSize;
+    int renderSize;
+    clickableTextBox** clickables;
+    int clickableSize;
+    scene::screen whenChange;
+    int songNumber;
 public:
     scene(HWND hwnd);
     ~scene();
@@ -38,5 +44,8 @@ public:
     bool render();
     bool changeScene(scene::screen);
     bool clearScene();
+    void onMove(D2D1_POINT_2F moved);
+    void onClick(D2D1_POINT_2F clicked);
+    void checkScene();
 private:
 };
