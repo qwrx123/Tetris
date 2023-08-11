@@ -5,9 +5,9 @@ const WCHAR textBox::msc_fontName[8] = L"Verdana";
 textBox::textBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, 
     IDWriteFactory* pDWriteFactory, const wchar_t myText[], block::style myStyle)
 : block(renderTarget, setLocation, screenSize, myStyle), boxText(myText), stringLength(wcsnlen(myText, 1000)),
-origin(D2D1_POINT_2F{screenSize.right * coordinates.left, screenSize.bottom * coordinates.top})
+origin(D2D1_POINT_2F{screenSize.right * coordinates.left, screenSize.bottom * coordinates.top}), pDWriteFactory(pDWriteFactory)
 {
-    
+    pDWriteFactory->AddRef();
     pDWriteFactory->CreateTextFormat(
         msc_fontName,
 		NULL,
@@ -34,6 +34,10 @@ origin(D2D1_POINT_2F{screenSize.right * coordinates.left, screenSize.bottom * co
 
 textBox::~textBox()
 {
+    if (pDWriteFactory)
+    {
+        pDWriteFactory->Release();
+    }
     if (pTextFormat)
     {
         pTextFormat->Release();
@@ -78,12 +82,37 @@ bool textBox::resize(RECT newScreen)
     return true;
 }
 
+bool textBox::changeText(const wchar_t newText[])
+{
+    boxText = newText;
+    stringLength = wcsnlen(boxText, 1000);
+    DWRITE_TEXT_RANGE fullRange = {0, (u_int)stringLength};
+    float fontSize;
+    pTextLayout->GetFontSize(0, &fontSize);
+    
+    pTextLayout->Release();
+    pDWriteFactory->CreateTextLayout(
+        boxText,
+        stringLength,
+        pTextFormat,
+        screen.right * coordinates.width,
+        screen.bottom * coordinates.height,
+        &pTextLayout
+        );
+
+    pTextLayout->SetFontSize(fontSize, fullRange);
+    this->textSizeFit();
+
+    return true;
+}
+
 bool textBox::textSizeFit()
 {
     DWRITE_TEXT_RANGE fullRange = {0, (u_int)stringLength};
     
     DWRITE_TEXT_METRICS metrics;
     pTextLayout->GetMetrics(&metrics);
+    
     float margin = (metrics.layoutHeight < metrics.layoutWidth) ? metrics.layoutHeight*0.1 : metrics.layoutWidth*0.1;
 
     DWRITE_OVERHANG_METRICS overhangs;

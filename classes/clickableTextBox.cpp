@@ -12,6 +12,11 @@ void clickableTextBox::onClick(D2D1_POINT_2F clicked)
     clickableTextBox::clicked = true;
 }
 
+void clickableTextBox::onCapture(D2D1_POINT_2F captured)
+{
+
+}
+
 bool clickableTextBox::parseClick()
 {
     bool returnClick = clicked;

@@ -17,6 +17,7 @@ class textBox : public block
 public:
 protected:
 static const WCHAR msc_fontName[8];
+IDWriteFactory* pDWriteFactory;
 IDWriteTextFormat* pTextFormat;
 IDWriteTextLayout *pTextLayout;
 const wchar_t* boxText;
@@ -28,6 +29,7 @@ public:
     ~textBox();
 	virtual bool render();
     virtual bool resize(RECT newScreen);
+    bool changeText(const wchar_t newText[]);
 protected:
     bool textSizeFit();
 };

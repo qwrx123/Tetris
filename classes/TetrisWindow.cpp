@@ -52,6 +52,12 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		lpMMI->ptMinTrackSize.y = 300;
 		return 0;
 	}
+	case WM_LBUTTONDOWN:
+	{
+		D2D1_POINT_2F clickPoint{(float)GET_X_LPARAM(lParam), (float)GET_Y_LPARAM(lParam)};
+		myScene->onCapture(clickPoint);
+		return 0;
+	}
 	case WM_LBUTTONUP:
 	{
 		D2D1_POINT_2F clickPoint{(float)GET_X_LPARAM(lParam), (float)GET_Y_LPARAM(lParam)};

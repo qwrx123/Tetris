@@ -36,6 +36,7 @@ private:
     clickableTextBox** clickables;
     int clickableSize;
     scene::screen whenChange;
+    int volumeScale;
     int songNumber;
 public:
     scene(HWND hwnd);
@@ -46,6 +47,7 @@ public:
     bool clearScene();
     void onMove(D2D1_POINT_2F moved);
     void onClick(D2D1_POINT_2F clicked);
+    void onCapture(D2D1_POINT_2F captrue);
     void checkScene();
 private:
 };
