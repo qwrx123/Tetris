@@ -9,7 +9,7 @@
 class cyclingTextBox : public clickableTextBox
 {
 public:
-private:
+protected:
 scene::screen* changeScene;
 scene::screen changeTo;
 IDWriteTextLayout **pTextLayout;
@@ -24,6 +24,6 @@ cyclingTextBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation,
 ~cyclingTextBox();
 virtual void onClick(D2D1_POINT_2F clicked);
 virtual bool resize(RECT newScreen);
-private:
+protected:
 void cycleTextBox();
 };
