@@ -9,7 +9,11 @@ clickableTextBox::clickableTextBox(ID2D1HwndRenderTarget* renderTarget, block::l
 
 void clickableTextBox::onClick(D2D1_POINT_2F clicked)
 {
-    clickableTextBox::clicked = true;
+    if (clicked.x > drawnRect.left && clicked.x < drawnRect.right &&
+        clicked.y > drawnRect.top && clicked.y < drawnRect.bottom)
+    {
+        clickableTextBox::clicked = true;
+    }
 }
 
 void clickableTextBox::onCapture(D2D1_POINT_2F captured)

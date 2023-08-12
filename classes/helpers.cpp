@@ -65,3 +65,14 @@ namespace helper
 		}
     }
 }
+
+int helper::intToNumDigets(int findDigets)
+{
+	int numDigets = 0;
+	while(findDigets > 0)
+	{
+		numDigets++;
+		findDigets /= 10;
+	}
+	return numDigets;
+}

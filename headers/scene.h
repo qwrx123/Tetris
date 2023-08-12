@@ -38,6 +38,7 @@ private:
     scene::screen whenChange;
     int volumeScale;
     int songNumber;
+    int difficulty;
     bool willDelete;
 public:
     scene(HWND hwnd);
