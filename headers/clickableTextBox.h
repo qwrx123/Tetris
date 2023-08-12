@@ -8,7 +8,7 @@
 class clickableTextBox : public textBox
 {
 public:
-private:
+protected:
 bool clicked;
 public:
 clickableTextBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, 
@@ -16,6 +16,7 @@ clickableTextBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocatio
 virtual void onCapture(D2D1_POINT_2F capturePoint);
 virtual void onClick(D2D1_POINT_2F clicked);
 virtual void onMove(D2D1_POINT_2F moved);
+virtual void onKey(wchar_t inputChar);
 virtual bool parseClick();
 private:
 };

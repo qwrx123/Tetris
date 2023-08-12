@@ -108,8 +108,12 @@ bool textBox::changeText(const wchar_t newText[])
 
 bool textBox::textSizeFit()
 {
+    if (stringLength == 0)
+    {
+        return true;
+    }
     DWRITE_TEXT_RANGE fullRange = {0, (u_int)stringLength};
-    
+
     DWRITE_TEXT_METRICS metrics;
     pTextLayout->GetMetrics(&metrics);
     

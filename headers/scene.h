@@ -32,6 +32,8 @@ private:
     IDWriteFactory* pDWriteFactory;
     ID2D1HwndRenderTarget* pRenderTarget;
     block** renderables;
+    wchar_t playerName[20] = L"Player";
+    int playerNameSize = 20;
     int renderSize;
     clickableTextBox** clickables;
     int clickableSize;
@@ -50,6 +52,7 @@ public:
     void onMove(D2D1_POINT_2F moved);
     void onClick(D2D1_POINT_2F clicked);
     void onCapture(D2D1_POINT_2F captrue);
+    void onKey(wchar_t inputChar);
     void checkScene();
 private:
 };

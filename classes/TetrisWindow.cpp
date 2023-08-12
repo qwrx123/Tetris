@@ -70,6 +70,11 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		myScene->onMove(movePoint);
 		return 0;
 	}
+	case WM_CHAR:
+	{
+		myScene->onKey((wchar_t)wParam);
+		return 0;
+	}
     default:
         return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
     }

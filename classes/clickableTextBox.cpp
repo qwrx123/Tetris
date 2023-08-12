@@ -40,3 +40,8 @@ void clickableTextBox::onMove(D2D1_POINT_2F moved)
         this->block::changeColor(block::colors::white);
     }
 }
+
+void clickableTextBox::onKey(wchar_t inputChar)
+{
+
+}
