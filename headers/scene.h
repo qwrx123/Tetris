@@ -13,10 +13,12 @@
 
 #include "block.h"
 #include "clickableTextBox.h"
+#include "game.h"
 
 class scene
 {
 public:
+
     enum screen
     {
         invalid = -1,
@@ -26,6 +28,7 @@ public:
         Control,
         Pause
     };
+
 private:
     HWND parentHwnd;
     ID2D1Factory* pD2DFactory;
@@ -42,6 +45,7 @@ private:
     int songNumber;
     int difficulty;
     bool willDelete;
+    game *tetrisGame;
 public:
     scene(HWND hwnd);
     ~scene();
@@ -53,6 +57,8 @@ public:
     void onClick(D2D1_POINT_2F clicked);
     void onCapture(D2D1_POINT_2F captrue);
     void onKey(wchar_t inputChar);
+    void keyDown(wchar_t inputChar);
+    void keyUp(wchar_t inputChar);
     void checkScene();
 private:
 };

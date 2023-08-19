@@ -108,7 +108,7 @@ bool textBox::changeText(const wchar_t newText[])
 
 bool textBox::textSizeFit()
 {
-    if (stringLength == 0)
+    if (stringLength == 0 || screen.right == 0)
     {
         return true;
     }

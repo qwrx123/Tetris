@@ -1,7 +1,3 @@
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
 #include "../headers/TetrisWindow.h"
 
 #include "../headers/BaseWindow.h"
@@ -73,6 +69,16 @@ LRESULT TetrisWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 	{
 		myScene->onKey((wchar_t)wParam);
+		return 0;
+	}
+	case WM_KEYDOWN:
+	{
+		myScene->keyDown((wchar_t)wParam);
+		return 0;
+	}
+	case WM_KEYUP:
+	{
+		myScene->keyUp((wchar_t)wParam);
 		return 0;
 	}
     default:
