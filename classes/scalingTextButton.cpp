@@ -48,16 +48,18 @@ bool scalingTextButton::resize(RECT newScreen)
     lowerBlock.resize(newScreen);
 
     float halfBoxHeight = (drawnRect.bottom - drawnRect.top)/2;
-    float margin = halfBoxHeight - screen.bottom*0.005;
+    float quarterBoxWidth = (drawnRect.right - drawnRect.left)/4;
+    float smallerSize = halfBoxHeight < quarterBoxWidth ? halfBoxHeight : quarterBoxWidth;
+    float margin = smallerSize - smallerSize*0.15;
 
     scrollingEllipse.radiusX = margin;
     scrollingEllipse.radiusY = margin;
 
-    linePoints[0] = {drawnRect.left + halfBoxHeight, drawnRect.top + halfBoxHeight};
-    linePoints[1] = {drawnRect.right - halfBoxHeight, linePoints[0].y};
+    linePoints[0] = {drawnRect.left + smallerSize, drawnRect.top + halfBoxHeight};
+    linePoints[1] = {drawnRect.right - smallerSize, linePoints[0].y};
 
     float lineLength = linePoints[1].x - linePoints[0].x;
-    scrollingEllipse.point = {drawnRect.left + halfBoxHeight + lineLength * ((float)inScalar/100.0f), linePoints[0].y};
+    scrollingEllipse.point = {drawnRect.left + smallerSize + lineLength * ((float)inScalar/100.0f), linePoints[0].y};
 
     return true;
 }
