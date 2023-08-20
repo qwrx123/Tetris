@@ -27,7 +27,26 @@ struct ghostBlocks {
 	int y = 0;
 	int type = 15;
 };
+struct leaderboard {
+	wchar_t name[20];
+	int score;
+	wchar_t scoreText[10];
+};
+struct gameMetrics
+{
+	wchar_t name[20];
+	int score;
+	wchar_t scoreText[10];
+	int level;
+	wchar_t levelText[10];
+	int lines;
+	wchar_t linesText[10];
+};
 private:
+wchar_t playerName[20] = L"Player";
+int songVolume;
+int effectVolume;
+int songNumber;
 currentBlocks currentBlocks[4];
 ghostBlocks ghostBlocks[4];
 int screenBlocks[10][20];
@@ -63,7 +82,7 @@ char canHold = true;
 RECT currentScreenSize;
 bool died;
 public:
-game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize);
+game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize, wchar_t playerName[20], int startingLevel, int songNumber, int musicVolume, int effectVolume);
 ~game();
 void render();
 void gameLoop();
@@ -71,6 +90,7 @@ void keyDown(wchar_t inputChar);
 void onKey(wchar_t inputChar);
 void resize(RECT newScreen);
 bool testDeath();
+void populateMetrics(game::gameMetrics& populate);
 private:
 void sendBlocks();
 bool dropBlocks();

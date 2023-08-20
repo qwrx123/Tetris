@@ -5,7 +5,7 @@ const block::location game::gameSquareBoundary = {0.21, 0.38, 0.24, 0.74};
 const float game::timing[] = {48.0f/60.0f, 43.0f/60.0f, 38.0f/60.0f, 33.0f/60.0f, 28.0f/60.0f, 23.0f/60.0f, 18.0f/60.0f, 13.0f/60.0f, 8.0f/60.0f, 6.0f/60.0f
 					, 5.0f/60.0f, 5.0f/60.0f, 5.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f};
 
-game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize)
+game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize, wchar_t playerName[20], int startingLevel, int songNumber, int musicVolume, int effectVolume)
     :scoreLabel(renderTarget, {0.55, 0.05, 0.15, 0.05}, screenSize, pDWriteFactory, L"Score"), 
     scoreDisplay(renderTarget, {0.6, 0.05, 0.15, 0.05}, screenSize, pDWriteFactory, L"0"),
     levelLabel(renderTarget, {0.65, 0.05, 0.15, 0.05}, screenSize, pDWriteFactory, L"Level"),
@@ -20,8 +20,7 @@ game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, 
     nextPieces{tetrisPiece(renderTarget, {0.42, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.54, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.66, 0.81, 0.13, 0.1}, screenSize)},
-	died(false)
-    
+	died(false), score(0), level(startingLevel), lines(0)
 {
     for (int i = 0; i < 10; i++)
     {
@@ -42,6 +41,11 @@ game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, 
 	findGhost();
     setCount = timing[level];
 	count = setCount;
+	wcsncpy(game::playerName, playerName, 20);
+	helper::intToText(scoreText, 9, score);
+	helper::intToText(linesText, 9, lines);
+	helper::intToText(levelText, 9, level);
+	levelDisplay.changeText(levelText);
 }
 
 game::~game()
@@ -54,10 +58,23 @@ game::~game()
         }
     }
 }
+
 bool game::testDeath()
 {
 	return died;
 }
+
+void game::populateMetrics(game::gameMetrics& populate)
+{
+	wcsncpy(populate.name, playerName, 20);
+	populate.score = game::score;
+	wcsncpy(populate.scoreText, game::scoreText, 10);
+	populate.level = game::level;
+	wcsncpy(populate.levelText, game::levelText, 10);
+	populate.lines = game::lines;
+	wcsncpy(populate.linesText, game::linesText, 10);
+}
+
 void game::gameLoop()
 {
     countTime.calculateDeltaTime();

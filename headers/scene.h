@@ -30,6 +30,8 @@ public:
     };
 
 private:
+    game::gameMetrics currentMetrics;
+    game::leaderboard currentLeaderboard[5];
     HWND parentHwnd;
     ID2D1Factory* pD2DFactory;
     IDWriteFactory* pDWriteFactory;
@@ -42,10 +44,12 @@ private:
     int clickableSize;
     scene::screen whenChange;
     int volumeScale;
+    int effectScale;
     int songNumber;
     int difficulty;
     bool willDelete;
     game *tetrisGame;
+    bool gamePaused;
 public:
     scene(HWND hwnd);
     ~scene();
@@ -61,4 +65,5 @@ public:
     void keyUp(wchar_t inputChar);
     void checkScene();
 private:
+    void calculateLeaderboard();
 };
