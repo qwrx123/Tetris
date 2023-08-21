@@ -5,8 +5,8 @@ const wchar_t* warningTextBox::warningText[2] = {L"h", L"Are You Sure"};
 
 warningTextBox::warningTextBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, 
         IDWriteFactory* pDWriteFactory, const wchar_t* myText, bool* outWarned, block::style myStyle)
-    : cyclingTextBox(renderTarget, setLocation, screenSize, pDWriteFactory, warningText, 2, &extendCycle, myStyle),
-        warned(outWarned)
+    : cyclingTextBox(renderTarget, setLocation, screenSize, pDWriteFactory, warningText, 2, &extendCycle, 0, myStyle),
+        warned(outWarned), extendCycle(0)
 {
     textBox::changeText(myText);
     cyclingTextBox::myText[0] = myText;

@@ -1,7 +1,7 @@
 #include "../headers/game.h"
 #include "../headers/scene.h"
 
-const block::location game::gameSquareBoundary = {0.21, 0.38, 0.24, 0.74};
+const block::location game::gameSquareBoundary = {0.21, 0.3, 0.4, 0.74};
 const float game::timing[] = {48.0f/60.0f, 43.0f/60.0f, 38.0f/60.0f, 33.0f/60.0f, 28.0f/60.0f, 23.0f/60.0f, 18.0f/60.0f, 13.0f/60.0f, 8.0f/60.0f, 6.0f/60.0f
 					, 5.0f/60.0f, 5.0f/60.0f, 5.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f};
 

@@ -58,6 +58,7 @@ BOOL BaseWindow<DERIVED_TYPE>::Create(
     wc.lpfnWndProc   = DERIVED_TYPE::WindowProc;
     wc.hInstance     = GetModuleHandle(NULL);
     wc.lpszClassName = ClassName();
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 
     RegisterClass(&wc);
 

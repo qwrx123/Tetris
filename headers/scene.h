@@ -29,7 +29,20 @@ public:
         Pause
     };
 
+    struct mySettings {
+        int version;
+        wchar_t soundVolumeT[5];
+        int soundVolume;
+        wchar_t effectVolumeT[5];
+        int effectVolume;
+        wchar_t startLevelT[10];
+        int startLevel;
+        int songChoice;
+        wchar_t name[20];
+    };
 private:
+    mySettings settings;
+    int settingVersion;
     game::gameMetrics currentMetrics;
     game::leaderboard currentLeaderboard[5];
     HWND parentHwnd;
@@ -37,16 +50,11 @@ private:
     IDWriteFactory* pDWriteFactory;
     ID2D1HwndRenderTarget* pRenderTarget;
     block** renderables;
-    wchar_t playerName[20] = L"Player";
     int playerNameSize = 20;
     int renderSize;
     clickableTextBox** clickables;
     int clickableSize;
     scene::screen whenChange;
-    int volumeScale;
-    int effectScale;
-    int songNumber;
-    int difficulty;
     bool willDelete;
     game *tetrisGame;
     bool gamePaused;
@@ -66,4 +74,9 @@ public:
     void checkScene();
 private:
     void calculateLeaderboard();
+    void saveLeaderboard();
+    void deleteLeaderboard();
+    void initializeLeaderboard();
+    void initializeSettings();
+    void saveSettings();
 };

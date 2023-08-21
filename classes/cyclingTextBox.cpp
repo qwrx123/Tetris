@@ -3,10 +3,10 @@
 
 cyclingTextBox::cyclingTextBox(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, 
         IDWriteFactory* pDWriteFactory, const wchar_t** myText, int arraySize, int* outCycleNumber
-        , block::style myStyle)
+        , int startCycle, block::style myStyle)
     :clickableTextBox(renderTarget, setLocation, screenSize, pDWriteFactory, myText[0], myStyle), 
 		pTextLayout(new IDWriteTextLayout*[arraySize]), myText(new const wchar_t*[arraySize]), stringLengths(new int[arraySize]),
-		arraySize(arraySize), currentCycle(0)
+		arraySize(arraySize), currentCycle(0), outCycle(outCycleNumber)
 {
     if (arraySize > 0)
 	{
@@ -30,10 +30,15 @@ cyclingTextBox::cyclingTextBox(ID2D1HwndRenderTarget* renderTarget, block::locat
 			&pTextLayout[i]
 			);
 	}
+
+	for (int i = startCycle; i > 0; i--)
+	{
+		this->cycleTextBox();
+	}
 }
 
 cyclingTextBox::~cyclingTextBox()
-{
+{ 
 	for (int i = 0; i < arraySize; i++)
 	{
 		pTextLayout[i]->Release();
@@ -52,6 +57,7 @@ void cyclingTextBox::cycleTextBox()
 	textBox::pTextLayout = pTextLayout[currentCycle];
 	textBox::boxText = myText[currentCycle];
 	textBox::stringLength = stringLengths[currentCycle];
+	*outCycle = currentCycle;
 	textSizeFit();
 }
 

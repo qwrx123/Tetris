@@ -101,7 +101,7 @@ void scalingTextButton::onMove(D2D1_POINT_2F moved)
         tempScale *= 100;
         inScalar = (int)tempScale;
     }
-
+    *outScalar = inScalar;
     helper::intToTextPercent(percentText, 4, inScalar);
     upperBlock.changeText(percentText);
     this->resize(screen);
