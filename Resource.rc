@@ -33,13 +33,13 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
-    "titlescreenSong WAVE tetrisgameboy01.wav\r\n"
-    "mainSong WAVE tetrisgameboy02.wav\r\n"
-    "mainSong2 WAVE tetrisgameboy03.wav\r\n"
-    "mainSong3 WAVE tetrisgameboy04.wav\r\n"
-    "deathscreenSong WAVE tetrisgameboy05.wav\r\n"
-    "dropPiece WAVE fall.wav\r\n"
-    "MAINICON ICON ""Icon.ico""\0"
+    "titlescreenSong WAVE assets/tetrisgameboy01.wav\r\n"
+    "mainSong WAVE assets/tetrisgameboy02.wav\r\n"
+    "mainSong2 WAVE assets/tetrisgameboy03.wav\r\n"
+    "mainSong3 WAVE assets/tetrisgameboy04.wav\r\n"
+    "deathscreenSong WAVE assets/tetrisgameboy05.wav\r\n"
+    "dropPiece WAVE assets/fall.wav\r\n"
+    "MAINICON ICON assets/Icon.ico\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -54,13 +54,13 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-titlescreenSong WAVE tetrisgameboy01.wav
-mainSong WAVE tetrisgameboy02.wav
-mainSong2 WAVE tetrisgameboy03.wav
-mainSong3 WAVE tetrisgameboy04.wav
-deathscreenSong WAVE tetrisgameboy05.wav
-dropPiece WAVE fall.wav
-MAINICON ICON "Icon.ico"
+titlescreenSong WAVE assets/tetrisgameboy01.wav
+mainSong WAVE assets/tetrisgameboy02.wav
+mainSong2 WAVE assets/tetrisgameboy03.wav
+mainSong3 WAVE assets/tetrisgameboy04.wav
+deathscreenSong WAVE assets/tetrisgameboy05.wav
+dropPiece WAVE assets/fall.wav
+MAINICON ICON assets/Icon.ico
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
