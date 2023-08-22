@@ -59,6 +59,7 @@ BOOL BaseWindow<DERIVED_TYPE>::Create(
     wc.hInstance     = GetModuleHandle(NULL);
     wc.lpszClassName = ClassName();
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hIcon = LoadIconW(wc.hInstance, L"MAINICON");
 
     RegisterClass(&wc);
 
@@ -66,7 +67,9 @@ BOOL BaseWindow<DERIVED_TYPE>::Create(
         dwExStyle, ClassName(), lpWindowName, dwStyle, x, y,
         nWidth, nHeight, hWndParent, hMenu, GetModuleHandle(NULL), this
         );
-
+    HICON hIcon = LoadIcon(wc.hInstance, L"MAINICON");
+	SendMessage(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+	SendMessage(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     return (m_hwnd ? TRUE : FALSE);
 }
 

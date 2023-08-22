@@ -117,7 +117,7 @@ BOOL TetrisWindow::Create(
     	hWndParent,
     	hMenu
     );
-
+	
 	myScene = new scene(m_hwnd);
 
 	return returnBool;

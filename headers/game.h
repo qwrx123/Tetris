@@ -9,6 +9,7 @@
 #include "helpers.h"
 #include "time.h"
 #include "tetrisPiece.h"
+#include "songManager.h"
 
 #include <random>
 
@@ -81,8 +82,9 @@ char holding = 0;
 char canHold = true;
 RECT currentScreenSize;
 bool died;
+songManager effectGenerator;
 public:
-game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize, wchar_t playerName[20], int startingLevel, int songNumber, int musicVolume, int effectVolume);
+game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize, wchar_t playerName[20], int startingLevel, int songNumber, int musicVolume, int effectVolume, songManager effectGenerator);
 ~game();
 void render();
 void gameLoop();

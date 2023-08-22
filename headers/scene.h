@@ -14,6 +14,7 @@
 #include "block.h"
 #include "clickableTextBox.h"
 #include "game.h"
+#include "songManager.h"
 
 class scene
 {
@@ -58,6 +59,7 @@ private:
     bool willDelete;
     game *tetrisGame;
     bool gamePaused;
+    songManager manageSongs;
 public:
     scene(HWND hwnd);
     ~scene();

@@ -1,0 +1,66 @@
+// Microsoft Visual C++ generated resource script.
+//
+//#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "titlescreenSong WAVE tetrisgameboy01.wav\r\n"
+    "mainSong WAVE tetrisgameboy02.wav\r\n"
+    "mainSong2 WAVE tetrisgameboy03.wav\r\n"
+    "mainSong3 WAVE tetrisgameboy04.wav\r\n"
+    "deathscreenSong WAVE tetrisgameboy05.wav\r\n"
+    "dropPiece WAVE fall.wav\r\n"
+    "MAINICON ICON ""Icon.ico""\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+titlescreenSong WAVE tetrisgameboy01.wav
+mainSong WAVE tetrisgameboy02.wav
+mainSong2 WAVE tetrisgameboy03.wav
+mainSong3 WAVE tetrisgameboy04.wav
+deathscreenSong WAVE tetrisgameboy05.wav
+dropPiece WAVE fall.wav
+MAINICON ICON "Icon.ico"
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
