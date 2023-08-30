@@ -20,7 +20,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PWSTR pCm
         return 0;
     }
 
-    ShowWindow(win.Window(), nCmdShow);
+    ShowWindow(win.Window(), SW_MAXIMIZE);
 
     win.forceRender();
 

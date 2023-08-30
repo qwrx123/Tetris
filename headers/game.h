@@ -16,18 +16,12 @@
 class game
 {
 public:
-struct currentBlocks {
-	int x;
-	int y;
-	int type;
+struct pieceLocation {
+	POINT location[4];
+	tetrisBlock::pieceType type;
 	int turn;
 };
 // the drop down blocks you see
-struct ghostBlocks {
-	int x = 0;
-	int y = 0;
-	int type = 15;
-};
 struct leaderboard {
 	wchar_t name[20];
 	int score;
@@ -48,15 +42,16 @@ wchar_t playerName[20] = L"Player";
 int songVolume;
 int effectVolume;
 int songNumber;
-currentBlocks currentBlocks[4];
-ghostBlocks ghostBlocks[4];
-int screenBlocks[10][20];
+pieceLocation currentBlocks;
+pieceLocation ghostBlocks;
 tetrisBlock* renderScreenBlocks[10][20];
+static const pieceLocation startingPosistions[8];
+static const POINT turnOffset[8][5][4];
 static const block::location gameSquareBoundary;
 Time countTime;
 float count;
 float setCount;
-char nextBlock[14];
+tetrisBlock::pieceType nextBlock[14];
 int score = 0;
 int level = 0;
 int lines = 0;
@@ -78,7 +73,7 @@ tetrisPiece nextPieces[3];
 static const float timing[];
 bool keys[0xffff];
 // current block in hold
-char holding = 0;
+tetrisBlock::pieceType holding;
 char canHold = true;
 RECT currentScreenSize;
 bool died;

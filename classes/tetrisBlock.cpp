@@ -1,7 +1,7 @@
 #include "../headers/tetrisBlock.h"
 
 tetrisBlock::tetrisBlock(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize, block::style myStyle)
-    :block(renderTarget, setLocation, screenSize, myStyle)
+    :block(renderTarget, setLocation, screenSize, myStyle), boardPiece(false)
 {
 
 }
@@ -10,6 +10,42 @@ void tetrisBlock::resize(block::location newLocation, RECT screenSize)
 {
     coordinates = newLocation;
     block::resize(screenSize);
+}
+
+void tetrisBlock::setPieceType(pieceType currentType, bool isBoard)
+{
+    boardPiece = isBoard;
+    this->currentType = currentType;
+    changeColor((int)currentType);
+}
+
+void tetrisBlock::setPieceType(tetrisBlock& otherBlock)
+{
+    setPieceType(otherBlock.getType(), otherBlock.testBoard());
+}
+tetrisBlock::pieceType tetrisBlock::getType()
+{
+    return currentType;
+}
+
+bool tetrisBlock::testBoard()
+{
+    return boardPiece;
+}
+
+void tetrisBlock::setBoard()
+{
+    boardPiece = true;
+}
+
+bool tetrisBlock::testGhost()
+{
+    return currentType == tetrisBlock::pieceType::GhostBlock;
+}
+
+bool tetrisBlock::testTile()
+{
+    return currentType == tetrisBlock::pieceType::Tile;
 }
 
 bool tetrisBlock::changeColor(int translateColor)
@@ -40,7 +76,7 @@ bool tetrisBlock::changeColor(int translateColor)
         case 7:
         block::changeColor(block::colors::red);
         break;
-        case 15:
+        case 8:
         block::changeColor(block::colors::gray);
         break;
     }

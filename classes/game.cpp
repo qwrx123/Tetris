@@ -4,6 +4,62 @@
 const block::location game::gameSquareBoundary = {0.21, 0.3, 0.4, 0.74};
 const float game::timing[] = {48.0f/60.0f, 43.0f/60.0f, 38.0f/60.0f, 33.0f/60.0f, 28.0f/60.0f, 23.0f/60.0f, 18.0f/60.0f, 13.0f/60.0f, 8.0f/60.0f, 6.0f/60.0f
 					, 5.0f/60.0f, 5.0f/60.0f, 5.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 4.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f, 3.0f/60.0f};
+const game::pieceLocation game::startingPosistions[] = {{{{3,0},{4,0},{5,0},{6,0}}, tetrisBlock::pieceType::IBlock, 1},
+														{{{3,0},{4,0},{5,0},{6,0}}, tetrisBlock::pieceType::IBlock, 1},
+														{{{3,0},{3,1},{4,1},{5,1}}, tetrisBlock::pieceType::JBlock, 1},
+														{{{3,1},{4,1},{5,1},{5,0}}, tetrisBlock::pieceType::LBlock, 1},
+														{{{4,0},{5,0},{4,1},{5,1}}, tetrisBlock::pieceType::OBlock, 1},
+														{{{3,1},{4,1},{4,0},{5,0}}, tetrisBlock::pieceType::SBlock, 1},
+														{{{3,1},{4,1},{5,1},{4,0}}, tetrisBlock::pieceType::TBlock, 1},
+														{{{3,0},{4,0},{4,1},{5,1}}, tetrisBlock::pieceType::ZBlock, 1}};
+
+const POINT game::turnOffset[8][5][4] = {{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, 1}, {1, 1}, {1, 1}, {1, 1}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{2, -1}, {1, 0}, {0, 1}, {-1, 2}},
+											{{1, 2}, {0, 1}, {-1, 0}, {-2, -1}},
+											{{-2, 1}, {-1, 0}, {0, -1}, {1, -2}},
+											{{-1, -2}, {0, -1}, {1, 0}, {2, 1}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{2, 0}, {1, -1}, {0, 0}, {-1, 1}},
+											{{0, 2}, {1, 1}, {0, 0}, {-1, -1}},
+											{{-2, 0}, {-1, 1}, {0, 0}, {1, -1}},
+											{{0, -2}, {-1, -1}, {0, 0}, {1, 1}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, -1}, {0, 0}, {-1, 1}, {0, 2}},
+											{{1, 1}, {0, 0}, {-1, -1}, {-2, 0}},
+											{{-1, 1}, {0, 0}, {1, -1}, {0, -2}},
+											{{-1, -1}, {0, 0}, {1, 1}, {2, 0}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{0, 0}, {0, 0}, {0, 0}, {0, 0}},
+											{{0, 0}, {0, 0}, {0, 0}, {0, 0}},
+											{{0, 0}, {0, 0}, {0, 0}, {0, 0}},
+											{{0, 0}, {0, 0}, {0, 0}, {0, 0}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, -1}, {0, 0}, {1, 1}, {0, 2}},
+											{{1, 1}, {0, 0}, {-1, 1}, {-2, 0}},
+											{{-1, 1}, {0, 0}, {-1, -1}, {0, -2}},
+											{{-1, -1}, {0, 0}, {1, -1}, {2, 0}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{1, -1}, {0, 0}, {-1, 1}, {1, 1}},
+											{{1, 1}, {0, 0}, {-1, -1}, {-1, 1}},
+											{{-1, 1}, {0, 0}, {1, -1}, {-1, -1}},
+											{{-1, -1}, {0, 0}, {1, 1}, {1, -1}}},
+											
+											{{{1, 1}, {1, 1}, {1, 1}, {1, 1}},
+											{{2, 0}, {1, 1}, {0, 0}, {-1, 1}},
+											{{0, 2}, {-1, 1}, {0, 0}, {-1, -1}},
+											{{-2, 0}, {-1, -1}, {0, 0}, {1, -1}},
+											{{0, -2}, {1, -1}, {0, 0}, {1, 1}}}};
 
 game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, RECT screenSize, wchar_t playerName[20], int startingLevel, int songNumber, int musicVolume, int effectVolume, songManager effectGenerator)
     :scoreLabel(renderTarget, {0.55, 0.05, 0.15, 0.05}, screenSize, pDWriteFactory, L"Score"), 
@@ -20,19 +76,19 @@ game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, 
     nextPieces{tetrisPiece(renderTarget, {0.42, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.54, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.66, 0.81, 0.13, 0.1}, screenSize)},
-	died(false), score(0), level(startingLevel), lines(0), effectGenerator(effectGenerator)
+	died(false), score(0), level(startingLevel), lines(0), effectGenerator(effectGenerator), holding(tetrisBlock::pieceType::Tile)
 {
     for (int i = 0; i < 10; i++)
     {
         for(int j = 0; j < 20; j++)
         {
             renderScreenBlocks[i][j] = new tetrisBlock(renderTarget, {0.1, 0.1, 0.1, 0.1}, screenSize);
-            screenBlocks[i][j] = 0;
+			renderScreenBlocks[i][j]->setPieceType(tetrisBlock::pieceType::Tile);
         }
     }
 	for(int i = 0; i < 14; i++)
 	{
-		nextBlock[i] = 0;
+		nextBlock[i] = tetrisBlock::pieceType::Tile;
 	}
     game::resize(screenSize);
     calculateNextBlocks(0, 7);//0 - 14 first time
@@ -134,6 +190,9 @@ void game::gameLoop()
 	}
 	if (keys[VK_DOWN] == true) {
 		dropBlocks();
+		score++;
+		helper::intToText(scoreText, 9, score);
+        scoreDisplay.changeText(scoreText);
 		findGhost();
 		keys[VK_DOWN] = false;
 	}
@@ -224,555 +283,219 @@ void game::keyDown(wchar_t inputChar)
     keys[inputChar] = true;
 }
 
-void game::sendBlocks() {
-	if ((screenBlocks[3][0] > 0 && screenBlocks[3][0] < 8) ||
-		(screenBlocks[4][0] > 0 && screenBlocks[4][0] < 8) ||
-		(screenBlocks[5][0] > 0 && screenBlocks[5][0] < 8) ||
-		(screenBlocks[6][0] > 0 && screenBlocks[6][0] < 8) ||
-		(screenBlocks[3][1] > 0 && screenBlocks[3][1] < 8) ||
-		(screenBlocks[4][1] > 0 && screenBlocks[4][1] < 8) ||
-		(screenBlocks[5][1] > 0 && screenBlocks[5][1] < 8) ||
-		(screenBlocks[6][1] > 0 && screenBlocks[6][1] < 8)) {
-        died = true;
-        /*
-		screen = DEATHSCREEN;
-		calculateLeaderboard();
-		if (songNumber == 1) {
-			pmainSongBuffer->Stop();
-		}
-		else if (songNumber == 2) {
-			pmainSong2Buffer->Stop();
-		}
-		else {
-			pmainSong3Buffer->Stop();
-		}
-		pdeathSongBuffer->SetCurrentPosition(0);
-		pdeathSongBuffer->Play(
-			0,  // Unused.
-			0,  // Priority for voice management.
-			DSBPLAY_LOOPING); // Flags.
+void game::sendBlocks() 
+{
+	if (renderScreenBlocks[3][0]->testBoard() ||
+		renderScreenBlocks[4][0]->testBoard() ||
+		renderScreenBlocks[5][0]->testBoard() ||
+		renderScreenBlocks[6][0]->testBoard() ||
+		renderScreenBlocks[3][1]->testBoard() ||
+		renderScreenBlocks[4][1]->testBoard() ||
+		renderScreenBlocks[5][1]->testBoard() ||
+		renderScreenBlocks[6][1]->testBoard())
+	{
+		died = true;
 		return;
-        */
 	}
-	if (nextBlock[0] == 1) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 0;
-		currentBlocks[0].type = 1;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 4;
-		currentBlocks[1].y = 0;
-		currentBlocks[1].type = 1;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 5;
-		currentBlocks[2].y = 0;
-		currentBlocks[2].type = 1;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 6;
-		currentBlocks[3].y = 0;
-		currentBlocks[3].type = 1;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 2) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 0;
-		currentBlocks[0].type = 2;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 3;
-		currentBlocks[1].y = 1;
-		currentBlocks[1].type = 2;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 4;
-		currentBlocks[2].y = 1;
-		currentBlocks[2].type = 2;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 5;
-		currentBlocks[3].y = 1;
-		currentBlocks[3].type = 2;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 3) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 1;
-		currentBlocks[0].type = 3;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 4;
-		currentBlocks[1].y = 1;
-		currentBlocks[1].type = 3;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 5;
-		currentBlocks[2].y = 1;
-		currentBlocks[2].type = 3;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 5;
-		currentBlocks[3].y = 0;
-		currentBlocks[3].type = 3;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 4) {
-		currentBlocks[0].x = 4;
-		currentBlocks[0].y = 0;
-		currentBlocks[0].type = 4;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 5;
-		currentBlocks[1].y = 0;
-		currentBlocks[1].type = 4;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 4;
-		currentBlocks[2].y = 1;
-		currentBlocks[2].type = 4;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 5;
-		currentBlocks[3].y = 1;
-		currentBlocks[3].type = 4;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 5) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 1;
-		currentBlocks[0].type = 5;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 4;
-		currentBlocks[1].y = 1;
-		currentBlocks[1].type = 5;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 4;
-		currentBlocks[2].y = 0;
-		currentBlocks[2].type = 5;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 5;
-		currentBlocks[3].y = 0;
-		currentBlocks[3].type = 5;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 6) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 1;
-		currentBlocks[0].type = 6;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 4;
-		currentBlocks[1].y = 1;
-		currentBlocks[1].type = 6;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 5;
-		currentBlocks[2].y = 1;
-		currentBlocks[2].type = 6;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 4;
-		currentBlocks[3].y = 0;
-		currentBlocks[3].type = 6;
-		currentBlocks[3].turn = 1;
-	}
-	else if (nextBlock[0] == 7) {
-		currentBlocks[0].x = 3;
-		currentBlocks[0].y = 0;
-		currentBlocks[0].type = 7;
-		currentBlocks[0].turn = 1;
-		currentBlocks[1].x = 4;
-		currentBlocks[1].y = 0;
-		currentBlocks[1].type = 7;
-		currentBlocks[1].turn = 1;
-		currentBlocks[2].x = 4;
-		currentBlocks[2].y = 1;
-		currentBlocks[2].type = 7;
-		currentBlocks[2].turn = 1;
-		currentBlocks[3].x = 5;
-		currentBlocks[3].y = 1;
-		currentBlocks[3].type = 7;
-		currentBlocks[3].turn = 1;
-	}
-	screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type + 7;
-	screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[1].type + 7;
-	screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[2].type + 7;
-	screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[3].type + 7;
-	renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-	renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-	renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-	renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
+	currentBlocks = startingPosistions[nextBlock[0]];
+	renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(currentBlocks.type);
+	renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(currentBlocks.type);
+	renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(currentBlocks.type);
+	renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(currentBlocks.type);
 	count = setCount;
 	canHold = true;
 	cycleNextBlocks();
 }
 
 bool game::dropBlocks() {
-	if ((screenBlocks[currentBlocks[0].x][currentBlocks[0].y + 1] == 0 || screenBlocks[currentBlocks[0].x][currentBlocks[0].y + 1] > 7)
-		&& (screenBlocks[currentBlocks[1].x][currentBlocks[1].y + 1] == 0 || screenBlocks[currentBlocks[1].x][currentBlocks[1].y + 1] > 7)
-		&& (screenBlocks[currentBlocks[2].x][currentBlocks[2].y + 1] == 0 || screenBlocks[currentBlocks[2].x][currentBlocks[2].y + 1] > 7)
-		&& (screenBlocks[currentBlocks[3].x][currentBlocks[3].y + 1] == 0 || screenBlocks[currentBlocks[3].x][currentBlocks[3].y + 1] > 7)
-		&& currentBlocks[0].y + 1 < 20 && currentBlocks[1].y + 1 < 20 && currentBlocks[2].y + 1 < 20 && currentBlocks[3].y + 1 < 20) {
-		screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = 0;
-		screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = 0;
-		screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = 0;
-		screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = 0;
-        renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(0);
-		currentBlocks[0].y++;
-		currentBlocks[1].y++;
-		currentBlocks[2].y++;
-		currentBlocks[3].y++;
-		screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[0].type + 7;
-        renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-        renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-        renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-        renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
+	if (currentBlocks.location[0].y + 1 < 20 && currentBlocks.location[1].y + 1 < 20 &&
+		currentBlocks.location[2].y + 1 < 20 && currentBlocks.location[3].y + 1 < 20 &&
+		!renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y + 1]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y + 1]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y + 1]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y + 1]->testBoard())
+	{
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		currentBlocks.location[0].y++;
+		currentBlocks.location[1].y++;
+		currentBlocks.location[2].y++;
+		currentBlocks.location[3].y++;
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(currentBlocks.type);
 		count = setCount;
 		return true;
 	}
-	else {
-		screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type;
-		screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[1].type;
-		screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[2].type;
-		screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[3].type;
-        renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-        renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-        renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-        renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
+	else 
+	{
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setBoard();
+        renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setBoard();
+        renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setBoard();
+        renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setBoard();
 		checkLines();
 		effectGenerator.playEffectSound();
 		sendBlocks();
 		return false;
 	}
+	return true;
 }
 
 void game::findGhost() {
 	bool isRunning = true;
-	if (screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] == 15) {
-		screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] = 0;
-        renderScreenBlocks[ghostBlocks[0].x][ghostBlocks[0].y]->changeColor(0);
+	if (renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->testGhost()) {
+        renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
 	}
-	if (screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] == 15) {
-		screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] = 0;
-        renderScreenBlocks[ghostBlocks[1].x][ghostBlocks[1].y]->changeColor(0);
+	if (renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->testGhost()) {
+        renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
 	}
-	if (screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] == 15) {
-		screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] = 0;
-        renderScreenBlocks[ghostBlocks[2].x][ghostBlocks[2].y]->changeColor(0);
+	if (renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->testGhost()) {
+        renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
 	}
-	if (screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] == 15) {
-		screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] = 0;
-        renderScreenBlocks[ghostBlocks[3].x][ghostBlocks[3].y]->changeColor(0);
+	if (renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->testGhost()) {
+        renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
 	}
-	ghostBlocks[0].x = currentBlocks[0].x;
-	ghostBlocks[0].y = currentBlocks[0].y;
-	ghostBlocks[1].x = currentBlocks[1].x;
-	ghostBlocks[1].y = currentBlocks[1].y;
-	ghostBlocks[2].x = currentBlocks[2].x;
-	ghostBlocks[2].y = currentBlocks[2].y;
-	ghostBlocks[3].x = currentBlocks[3].x;
-	ghostBlocks[3].y = currentBlocks[3].y;
+	ghostBlocks = currentBlocks;
 	while (isRunning) {
-		if ((screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y + 1] == 0 || screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y + 1] > 7)
-			&& (screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y + 1] == 0 || screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y + 1] > 7)
-			&& (screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y + 1] == 0 || screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y + 1] > 7)
-			&& (screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y + 1] == 0 || screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y + 1] > 7)
-			&& ghostBlocks[0].y + 1 < 20 && ghostBlocks[1].y + 1 < 20 && ghostBlocks[2].y + 1 < 20 && ghostBlocks[3].y + 1 < 20) {
-			if (screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] == 15) {
-				screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] = 0;
-                renderScreenBlocks[ghostBlocks[0].x][ghostBlocks[0].y]->changeColor(0);
+		if (ghostBlocks.location[0].y + 1 < 20 && ghostBlocks.location[1].y + 1 < 20 &&
+			ghostBlocks.location[2].y + 1 < 20 && ghostBlocks.location[3].y + 1 < 20 &&
+			!renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y + 1]->testBoard() &&
+			!renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y + 1]->testBoard() &&
+			!renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y + 1]->testBoard() &&
+			!renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y + 1]->testBoard())
+		{
+			if (renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->testGhost())
+			{
+                renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
 			}
-			if (screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] == 15) {
-				screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] = 0;
-                renderScreenBlocks[ghostBlocks[1].x][ghostBlocks[1].y]->changeColor(0);
+			if (renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->testGhost())
+			{
+                renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
 			}
-			if (screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] == 15) {
-				screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] = 0;
-                renderScreenBlocks[ghostBlocks[2].x][ghostBlocks[2].y]->changeColor(0);
+			if (renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->testGhost())
+			{
+                renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
 			}
-			if (screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] == 15) {
-				screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] = 0;
-                renderScreenBlocks[ghostBlocks[3].x][ghostBlocks[3].y]->changeColor(0);
+			if (renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->testGhost())
+			{
+                renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
 			}
-			ghostBlocks[0].y++;
-			ghostBlocks[1].y++;
-			ghostBlocks[2].y++;
-			ghostBlocks[3].y++;
-			if (screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] == 0) {
-				screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[0].x][ghostBlocks[0].y]->changeColor(ghostBlocks[0].type);
+			ghostBlocks.location[0].y++;
+			ghostBlocks.location[1].y++;
+			ghostBlocks.location[2].y++;
+			ghostBlocks.location[3].y++;
+			if (renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->testTile())
+			{
+                renderScreenBlocks[ghostBlocks.location[0].x][ghostBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::GhostBlock);
 			}
-			if (screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] == 0) {
-				screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[1].x][ghostBlocks[1].y]->changeColor(ghostBlocks[0].type);
+			if (renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->testTile())
+			{
+                renderScreenBlocks[ghostBlocks.location[1].x][ghostBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::GhostBlock);
 			}
-			if (screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] == 0) {
-				screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[2].x][ghostBlocks[2].y]->changeColor(ghostBlocks[0].type);
+			if (renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->testTile())
+			{
+                renderScreenBlocks[ghostBlocks.location[2].x][ghostBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::GhostBlock);
 			}
-			if (screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] == 0) {
-				screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[3].x][ghostBlocks[3].y]->changeColor(ghostBlocks[0].type);
+			if (renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->testTile())
+			{
+                renderScreenBlocks[ghostBlocks.location[3].x][ghostBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::GhostBlock);
 			}
 			isRunning = true;
 		}
 		else {
-			if (screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] == 0) {
-				screenBlocks[ghostBlocks[0].x][ghostBlocks[0].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[0].x][ghostBlocks[0].y]->changeColor(ghostBlocks[0].type);
-			}
-			if (screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] == 0) {
-				screenBlocks[ghostBlocks[1].x][ghostBlocks[1].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[1].x][ghostBlocks[1].y]->changeColor(ghostBlocks[0].type);
-			}
-			if (screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] == 0) {
-				screenBlocks[ghostBlocks[2].x][ghostBlocks[2].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[2].x][ghostBlocks[2].y]->changeColor(ghostBlocks[0].type);
-			}
-			if (screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] == 0) {
-				screenBlocks[ghostBlocks[3].x][ghostBlocks[3].y] = ghostBlocks[0].type;
-                renderScreenBlocks[ghostBlocks[3].x][ghostBlocks[3].y]->changeColor(ghostBlocks[0].type);
-			}
 			isRunning = false;
 		}
 	}
 }
 
 void game::moveBlocks(int direction) {
-	if ((screenBlocks[currentBlocks[0].x + direction][currentBlocks[0].y] == 0 || screenBlocks[currentBlocks[0].x + direction][currentBlocks[0].y] > 7)
-		&& (screenBlocks[currentBlocks[1].x + direction][currentBlocks[1].y] == 0 || screenBlocks[currentBlocks[1].x + direction][currentBlocks[1].y] > 7)
-		&& (screenBlocks[currentBlocks[2].x + direction][currentBlocks[2].y] == 0 || screenBlocks[currentBlocks[2].x + direction][currentBlocks[2].y] > 7)
-		&& (screenBlocks[currentBlocks[3].x + direction][currentBlocks[3].y] == 0 || screenBlocks[currentBlocks[3].x + direction][currentBlocks[3].y] > 7)
-		&& currentBlocks[0].x + direction <= 9 && currentBlocks[1].x + direction <= 9 && currentBlocks[2].x + direction <= 9 && currentBlocks[3].x + direction <= 9 &&
-		currentBlocks[0].x + direction >= 0 && currentBlocks[1].x + direction >= 0 && currentBlocks[2].x + direction >= 0 && currentBlocks[3].x + direction >= 0) {
-
-		screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = 0;
-		screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = 0;
-		screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = 0;
-		screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = 0;
-        renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(0);
-        renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(0);
-		currentBlocks[0].x += direction;
-		currentBlocks[1].x += direction;
-		currentBlocks[2].x += direction;
-		currentBlocks[3].x += direction;
-		screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[0].type + 7;
-		screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[0].type + 7;
-        renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-        renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-        renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-        renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
+	if (currentBlocks.location[0].x + direction <= 9 && currentBlocks.location[1].x + direction <= 9 &&
+		currentBlocks.location[2].x + direction <= 9 && currentBlocks.location[3].x + direction <= 9 &&
+		currentBlocks.location[0].x + direction >= 0 && currentBlocks.location[1].x + direction >= 0 &&
+		currentBlocks.location[2].x + direction >= 0 && currentBlocks.location[3].x + direction >= 0 &&
+		!renderScreenBlocks[currentBlocks.location[0].x + direction][currentBlocks.location[0].y]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[1].x + direction][currentBlocks.location[1].y]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[2].x + direction][currentBlocks.location[2].y]->testBoard() &&
+		!renderScreenBlocks[currentBlocks.location[3].x + direction][currentBlocks.location[3].y]->testBoard())
+	{
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
+		currentBlocks.location[0].x += direction;
+		currentBlocks.location[1].x += direction;
+		currentBlocks.location[2].x += direction;
+		currentBlocks.location[3].x += direction;
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(currentBlocks.type);
 	}
 }
 
 void game::switchHold() {
-	if (canHold == false) {
+	if (canHold == false)
+	{
 		return;
 	}
-    renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(0);
-	screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = 0;
-	screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = 0;
-	screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = 0;
-	screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = 0;
-	if (holding == 0) {
-		holding = currentBlocks[0].type;
+	renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
+	renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
+	renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
+	renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
+	if (holding == tetrisBlock::pieceType::Tile)
+	{
+		holding = currentBlocks.type;
 		sendBlocks();
 	}
-	else {
-		if (holding == 1) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 0;
-			currentBlocks[0].type = 1;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 4;
-			currentBlocks[1].y = 0;
-			currentBlocks[1].type = 1;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 5;
-			currentBlocks[2].y = 0;
-			currentBlocks[2].type = 1;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 6;
-			currentBlocks[3].y = 0;
-			currentBlocks[3].type = 1;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 2) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 0;
-			currentBlocks[0].type = 2;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 3;
-			currentBlocks[1].y = 1;
-			currentBlocks[1].type = 2;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 4;
-			currentBlocks[2].y = 1;
-			currentBlocks[2].type = 2;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 5;
-			currentBlocks[3].y = 1;
-			currentBlocks[3].type = 2;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 3) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 1;
-			currentBlocks[0].type = 3;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 4;
-			currentBlocks[1].y = 1;
-			currentBlocks[1].type = 3;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 5;
-			currentBlocks[2].y = 1;
-			currentBlocks[2].type = 3;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 5;
-			currentBlocks[3].y = 0;
-			currentBlocks[3].type = 3;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 4) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 4;
-			currentBlocks[0].y = 0;
-			currentBlocks[0].type = 4;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 5;
-			currentBlocks[1].y = 0;
-			currentBlocks[1].type = 4;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 4;
-			currentBlocks[2].y = 1;
-			currentBlocks[2].type = 4;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 5;
-			currentBlocks[3].y = 1;
-			currentBlocks[3].type = 4;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 5) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 1;
-			currentBlocks[0].type = 5;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 4;
-			currentBlocks[1].y = 1;
-			currentBlocks[1].type = 5;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 4;
-			currentBlocks[2].y = 0;
-			currentBlocks[2].type = 5;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 5;
-			currentBlocks[3].y = 0;
-			currentBlocks[3].type = 5;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 6) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 1;
-			currentBlocks[0].type = 6;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 4;
-			currentBlocks[1].y = 1;
-			currentBlocks[1].type = 6;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 5;
-			currentBlocks[2].y = 1;
-			currentBlocks[2].type = 6;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 4;
-			currentBlocks[3].y = 0;
-			currentBlocks[3].type = 6;
-			currentBlocks[3].turn = 1;
-		}
-		else if (holding == 7) {
-			holding = currentBlocks[0].type;
-			currentBlocks[0].x = 3;
-			currentBlocks[0].y = 0;
-			currentBlocks[0].type = 7;
-			currentBlocks[0].turn = 1;
-			currentBlocks[1].x = 4;
-			currentBlocks[1].y = 0;
-			currentBlocks[1].type = 7;
-			currentBlocks[1].turn = 1;
-			currentBlocks[2].x = 4;
-			currentBlocks[2].y = 1;
-			currentBlocks[2].type = 7;
-			currentBlocks[2].turn = 1;
-			currentBlocks[3].x = 5;
-			currentBlocks[3].y = 1;
-			currentBlocks[3].type = 7;
-			currentBlocks[3].turn = 1;
-		}
+	else
+	{
+		tetrisBlock::pieceType tempHold = currentBlocks.type;
+		currentBlocks = startingPosistions[holding];
+		renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(currentBlocks.type);
+		renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(currentBlocks.type);
+		holding = tempHold;
 	}
-	screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type + 7;
-	screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[1].type + 7;
-	screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[2].type + 7;
-	screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[3].type + 7;
-    renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-    renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-    renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-    renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
-    holdPiece.changePiece(holding, currentScreenSize);
+	holdPiece.changePiece(holding, currentScreenSize);
 	canHold = false;
 }
 
 void game::checkLines() {
 	int tempLines = 0;
-	for (int i = 19; i >= 0; i--) {
-		if (screenBlocks[0][i] > 0 && screenBlocks[1][i] > 0 && screenBlocks[2][i] > 0 && screenBlocks[3][i] > 0 &&
-			screenBlocks[4][i] > 0 && screenBlocks[5][i] > 0 && screenBlocks[6][i] > 0 && screenBlocks[7][i] > 0 &&
-			screenBlocks[8][i] > 0 && screenBlocks[9][i] > 0) {
-			for (int k = i; k > 0; k--) {
-				screenBlocks[0][k] = screenBlocks[0][k - 1];
-				screenBlocks[1][k] = screenBlocks[1][k - 1];
-				screenBlocks[2][k] = screenBlocks[2][k - 1];
-				screenBlocks[3][k] = screenBlocks[3][k - 1];
-				screenBlocks[4][k] = screenBlocks[4][k - 1];
-				screenBlocks[5][k] = screenBlocks[5][k - 1];
-				screenBlocks[6][k] = screenBlocks[6][k - 1];
-				screenBlocks[7][k] = screenBlocks[7][k - 1];
-				screenBlocks[8][k] = screenBlocks[8][k - 1];
-				screenBlocks[9][k] = screenBlocks[9][k - 1];
-                renderScreenBlocks[0][k]->changeColor(screenBlocks[0][k]);
-                renderScreenBlocks[1][k]->changeColor(screenBlocks[1][k]);
-                renderScreenBlocks[2][k]->changeColor(screenBlocks[2][k]);
-                renderScreenBlocks[3][k]->changeColor(screenBlocks[3][k]);
-                renderScreenBlocks[4][k]->changeColor(screenBlocks[4][k]);
-                renderScreenBlocks[5][k]->changeColor(screenBlocks[5][k]);
-                renderScreenBlocks[6][k]->changeColor(screenBlocks[6][k]);
-                renderScreenBlocks[7][k]->changeColor(screenBlocks[7][k]);
-                renderScreenBlocks[8][k]->changeColor(screenBlocks[8][k]);
-                renderScreenBlocks[9][k]->changeColor(screenBlocks[9][k]);
-
+	for (int i = 19; i >= 0; i--) 
+	{
+		if (renderScreenBlocks[0][i]->testBoard() && renderScreenBlocks[1][i]->testBoard() && renderScreenBlocks[2][i]->testBoard() &&
+			renderScreenBlocks[3][i]->testBoard() && renderScreenBlocks[4][i]->testBoard() && renderScreenBlocks[5][i]->testBoard() &&
+			renderScreenBlocks[6][i]->testBoard() && renderScreenBlocks[7][i]->testBoard() && renderScreenBlocks[8][i]->testBoard() &&
+			renderScreenBlocks[9][i]->testBoard())
+		{
+			for (int k = i; k > 0; k--)
+			{
+                renderScreenBlocks[0][k]->setPieceType(*renderScreenBlocks[0][k-1]);
+                renderScreenBlocks[1][k]->setPieceType(*renderScreenBlocks[1][k-1]);
+                renderScreenBlocks[2][k]->setPieceType(*renderScreenBlocks[2][k-1]);
+                renderScreenBlocks[3][k]->setPieceType(*renderScreenBlocks[3][k-1]);
+                renderScreenBlocks[4][k]->setPieceType(*renderScreenBlocks[4][k-1]);
+                renderScreenBlocks[5][k]->setPieceType(*renderScreenBlocks[5][k-1]);
+                renderScreenBlocks[6][k]->setPieceType(*renderScreenBlocks[6][k-1]);
+                renderScreenBlocks[7][k]->setPieceType(*renderScreenBlocks[7][k-1]);
+                renderScreenBlocks[8][k]->setPieceType(*renderScreenBlocks[8][k-1]);
+                renderScreenBlocks[9][k]->setPieceType(*renderScreenBlocks[9][k-1]);
 			}
-			screenBlocks[0][0] = 0;
-			screenBlocks[1][0] = 0;
-			screenBlocks[2][0] = 0;
-			screenBlocks[3][0] = 0;
-			screenBlocks[4][0] = 0;
-			screenBlocks[5][0] = 0;
-			screenBlocks[6][0] = 0;
-			screenBlocks[7][0] = 0;
-			screenBlocks[8][0] = 0;
-			screenBlocks[9][0] = 0;
-            renderScreenBlocks[0][0]->changeColor(0);
-            renderScreenBlocks[1][0]->changeColor(0);
-            renderScreenBlocks[2][0]->changeColor(0);
-            renderScreenBlocks[3][0]->changeColor(0);
-            renderScreenBlocks[4][0]->changeColor(0);
-            renderScreenBlocks[5][0]->changeColor(0);
-            renderScreenBlocks[6][0]->changeColor(0);
-            renderScreenBlocks[7][0]->changeColor(0);
-            renderScreenBlocks[8][0]->changeColor(0);
-            renderScreenBlocks[9][0]->changeColor(0);
+            renderScreenBlocks[0][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[1][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[2][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[3][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[4][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[5][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[6][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[7][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[8][0]->setPieceType(tetrisBlock::pieceType::Tile);
+            renderScreenBlocks[9][0]->setPieceType(tetrisBlock::pieceType::Tile);
 			tempLines++;
 			i++;
 		}
@@ -811,615 +534,49 @@ void game::checkLines() {
 	else {
 		setCount = 1 / 60;
 	}
-	//pmainSongBuffer->SetFrequency(44100 + lines * 100);
 }
 
 bool game::turnBlocks(int xShift, int yShift) {
-    bool turned = false;
-    screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = 0;
-	screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = 0;
-	screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = 0;
-	screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = 0;
-    renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(0);
-    renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(0);
-	if (currentBlocks[0].type == 1) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 2] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 2] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 2 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 2 >= 0
-				&& currentBlocks[0].x + xShift + 2 < 10 && currentBlocks[1].x + xShift + 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 2 >= 0 && currentBlocks[1].x + xShift + 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 2;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 1;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + 2;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
+	bool turned = false;
+	POINT currentTurn[4] = {{turnOffset[currentBlocks.type][currentBlocks.turn][0].x, turnOffset[currentBlocks.type][currentBlocks.turn][0].y},
+							{turnOffset[currentBlocks.type][currentBlocks.turn][1].x, turnOffset[currentBlocks.type][currentBlocks.turn][1].y},
+							{turnOffset[currentBlocks.type][currentBlocks.turn][2].x, turnOffset[currentBlocks.type][currentBlocks.turn][2].y},
+							{turnOffset[currentBlocks.type][currentBlocks.turn][3].x, turnOffset[currentBlocks.type][currentBlocks.turn][3].y}};
+	
+	renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(tetrisBlock::pieceType::Tile);
+    renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(tetrisBlock::pieceType::Tile);
+    renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(tetrisBlock::pieceType::Tile);
+    renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(tetrisBlock::pieceType::Tile);
+	
+	if (currentBlocks.location[0].y + yShift + currentTurn[0].y < 20 && currentBlocks.location[1].y + yShift + currentTurn[1].y < 20 && currentBlocks.location[2].y + yShift + currentTurn[2].y < 20 && currentBlocks.location[3].y + yShift + currentTurn[3].y < 20 &&
+			currentBlocks.location[0].y + yShift + currentTurn[0].y >= 0 && currentBlocks.location[1].y + yShift + currentTurn[1].y >= 0 && currentBlocks.location[2].y + yShift + currentTurn[2].y >= 0 && currentBlocks.location[3].y + yShift + currentTurn[3].y >= 0 &&
+			currentBlocks.location[0].x + xShift + currentTurn[0].x < 10 && currentBlocks.location[1].x + xShift + currentTurn[1].x < 10 && currentBlocks.location[2].x + xShift + currentTurn[2].x < 10 && currentBlocks.location[3].x + xShift + currentTurn[3].x < 10 &&
+			currentBlocks.location[0].x + xShift + currentTurn[0].x >= 0 && currentBlocks.location[1].x + xShift + currentTurn[1].x >= 0 && currentBlocks.location[2].x + xShift + currentTurn[2].x >= 0 && currentBlocks.location[3].x + xShift + currentTurn[3].x >= 0 && 
+			!renderScreenBlocks[currentBlocks.location[0].x + xShift + currentTurn[0].x][currentBlocks.location[0].y + yShift + currentTurn[0].y]->testBoard() &&
+			!renderScreenBlocks[currentBlocks.location[1].x + xShift + currentTurn[1].x][currentBlocks.location[1].y + yShift + currentTurn[1].y]->testBoard() &&
+			!renderScreenBlocks[currentBlocks.location[2].x + xShift + currentTurn[2].x][currentBlocks.location[2].y + yShift + currentTurn[2].y]->testBoard() &&
+			!renderScreenBlocks[currentBlocks.location[3].x + xShift + currentTurn[3].x][currentBlocks.location[3].y + yShift + currentTurn[3].y]->testBoard())
+	{
+		currentBlocks.location[0].x += xShift + currentTurn[0].x;
+		currentBlocks.location[0].y += yShift + currentTurn[0].y;
+		currentBlocks.location[1].x += xShift + currentTurn[1].x;
+		currentBlocks.location[1].y += yShift + currentTurn[1].y;
+		currentBlocks.location[2].x += xShift + currentTurn[2].x;
+		currentBlocks.location[2].y += yShift + currentTurn[2].y;
+		currentBlocks.location[3].x += xShift + currentTurn[3].x;
+		currentBlocks.location[3].y += yShift + currentTurn[3].y;
+		currentBlocks.turn++;
+		currentBlocks.turn = currentBlocks.turn%5;
+		if (!currentBlocks.turn)
+		{
+			currentBlocks.turn = 1;
 		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 2] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 2 < 20 && currentBlocks[1].y + yShift + 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 2 >= 0 && currentBlocks[1].y + yShift + 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift - 2 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift - 2 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + 2;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 1;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + -2;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 2] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 2] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift - 2 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift - 2 >= 0
-				&& currentBlocks[0].x + xShift - 2 < 10 && currentBlocks[1].x + xShift - 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift - 2 >= 0 && currentBlocks[1].x + xShift - 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + -2;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + -1;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + -2;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 2] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift - 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift - 2 < 20 && currentBlocks[1].y + yShift - 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift - 2 >= 0 && currentBlocks[1].y + yShift - 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 2 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 2 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + -2;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + -1;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + 2;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
+		turned = true;
 	}
-	else if (currentBlocks[0].type == 2) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift + 0] == 0 || screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift - 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift + 0 < 20 && currentBlocks[1].y + yShift - 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift + 0 >= 0 && currentBlocks[1].y + yShift - 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 2 < 10 && currentBlocks[1].x + xShift + 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 2 >= 0 && currentBlocks[1].x + xShift + 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 2;
-				currentBlocks[0].y += yShift + 0;
-				currentBlocks[1].x += xShift + 1;
-				currentBlocks[1].y += yShift + -1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift + 2] == 0 || screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift + 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 2 < 20 && currentBlocks[1].y + yShift + 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 2 >= 0 && currentBlocks[1].y + yShift + 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift + 0 < 10 && currentBlocks[1].x + xShift + 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 0 >= 0 && currentBlocks[1].x + xShift + 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 0;
-				currentBlocks[0].y += yShift + 2;
-				currentBlocks[1].x += xShift + 1;
-				currentBlocks[1].y += yShift + 1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 0] == 0 || screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 1] == 0 || screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 0 < 20 && currentBlocks[1].y + yShift + 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 0 >= 0 && currentBlocks[1].y + yShift + 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift - 2 < 10 && currentBlocks[1].x + xShift - 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift - 2 >= 0 && currentBlocks[1].x + xShift - 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + -2;
-				currentBlocks[0].y += yShift + 0;
-				currentBlocks[1].x += xShift + -1;
-				currentBlocks[1].y += yShift + 1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift - 2] == 0 || screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift - 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift - 1] == 0 || screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift - 2 < 20 && currentBlocks[1].y + yShift - 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift - 2 >= 0 && currentBlocks[1].y + yShift - 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 0 < 10 && currentBlocks[1].x + xShift - 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift + 0 >= 0 && currentBlocks[1].x + xShift - 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + 0;
-				currentBlocks[0].y += yShift + -2;
-				currentBlocks[1].x += xShift + -1;
-				currentBlocks[1].y += yShift + -1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
-	}
-	else if (currentBlocks[0].type == 3) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift + 2] == 0 || screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift + 2] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 2 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 2 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift + 0 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift + 0 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + 0;
-				currentBlocks[3].y += yShift + 2;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift + 0] == 0 || screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift + 0] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift + 0 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift + 0 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift - 2 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift - 2 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + -2;
-				currentBlocks[3].y += yShift + 0;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift - 2] == 0 || screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift - 2] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift - 2 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift - 2 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 0 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 0 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + 0;
-				currentBlocks[3].y += yShift + -2;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 0] == 0 || screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 0] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 0 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 0 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 2 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 2 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + 2;
-				currentBlocks[3].y += yShift + 0;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
-	}
-	else if (currentBlocks[0].type == 5) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift + 2] == 0 || screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift + 2] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 2 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 2 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 0 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 0 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + 0;
-				currentBlocks[3].y += yShift + 2;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift + 0] == 0 || screenBlocks[currentBlocks[3].x + xShift - 2][currentBlocks[3].y + yShift + 0] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 0 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 0 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift - 2 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift - 2 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + -2;
-				currentBlocks[3].y += yShift + 0;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift - 2] == 0 || screenBlocks[currentBlocks[3].x + xShift + 0][currentBlocks[3].y + yShift - 2] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift - 2 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift - 2 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift + 0 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift + 0 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + 0;
-				currentBlocks[3].y += yShift + -2;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 0] == 0 || screenBlocks[currentBlocks[3].x + xShift + 2][currentBlocks[3].y + yShift + 0] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift + 0 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift + 0 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 2 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 2 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + 2;
-				currentBlocks[3].y += yShift + 0;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
-	}
-	else if (currentBlocks[0].type == 6) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift + 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift - 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift - 1 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift - 1 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + -1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift - 1 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift - 1 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + 1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + -1;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] == 0 || screenBlocks[currentBlocks[0].x + xShift - 1][currentBlocks[0].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] == 0 || screenBlocks[currentBlocks[1].x + xShift + 0][currentBlocks[1].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] == 0 || screenBlocks[currentBlocks[2].x + xShift + 1][currentBlocks[2].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + -1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift - 1 < 20 && currentBlocks[1].y + yShift + 0 < 20 && currentBlocks[2].y + yShift + 1 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift - 1 >= 0 && currentBlocks[1].y + yShift + 0 >= 0 && currentBlocks[2].y + yShift + 1 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift - 1 < 10 && currentBlocks[1].x + xShift + 0 < 10 && currentBlocks[2].x + xShift + 1 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift - 1 >= 0 && currentBlocks[1].x + xShift + 0 >= 0 && currentBlocks[2].x + xShift + 1 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + -1;
-				currentBlocks[0].y += yShift + -1;
-				currentBlocks[1].x += xShift + 0;
-				currentBlocks[1].y += yShift + 0;
-				currentBlocks[2].x += xShift + 1;
-				currentBlocks[2].y += yShift + 1;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
-	}
-	else if (currentBlocks[0].type == 7) {
-		if (currentBlocks[0].turn == 1) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift + 0] == 0 || screenBlocks[currentBlocks[0].x + xShift + 2][currentBlocks[0].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift + 0 < 20 && currentBlocks[1].y + yShift + 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift + 0 >= 0 && currentBlocks[1].y + yShift + 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 2 < 10 && currentBlocks[1].x + xShift + 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 2 >= 0 && currentBlocks[1].x + xShift + 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 2;
-				currentBlocks[0].y += yShift + 0;
-				currentBlocks[1].x += xShift + 1;
-				currentBlocks[1].y += yShift + 1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 2;
-				currentBlocks[1].turn = 2;
-				currentBlocks[2].turn = 2;
-				currentBlocks[3].turn = 2;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 2) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift + 2] == 0 || screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift + 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 1] == 0 || screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift + 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift - 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 2 < 20 && currentBlocks[1].y + yShift + 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 2 >= 0 && currentBlocks[1].y + yShift + 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift + 0 < 10 && currentBlocks[1].x + xShift - 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift - 1 < 10
-				&& currentBlocks[0].x + xShift + 0 >= 0 && currentBlocks[1].x + xShift - 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift - 1 >= 0) {
-				currentBlocks[0].x += xShift + 0;
-				currentBlocks[0].y += yShift + 2;
-				currentBlocks[1].x += xShift + -1;
-				currentBlocks[1].y += yShift + 1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + -1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 3;
-				currentBlocks[1].turn = 3;
-				currentBlocks[2].turn = 3;
-				currentBlocks[3].turn = 3;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 3) {
-			if ((screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 0] == 0 || screenBlocks[currentBlocks[0].x + xShift - 2][currentBlocks[0].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift - 1] == 0 || screenBlocks[currentBlocks[1].x + xShift - 1][currentBlocks[1].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift - 1] > 7)
-				&& currentBlocks[0].y + yShift + 0 < 20 && currentBlocks[1].y + yShift - 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift - 1 < 20
-				&& currentBlocks[0].y + yShift + 0 >= 0 && currentBlocks[1].y + yShift - 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift - 1 >= 0
-				&& currentBlocks[0].x + xShift - 2 < 10 && currentBlocks[1].x + xShift - 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift - 2 >= 0 && currentBlocks[1].x + xShift - 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + -2;
-				currentBlocks[0].y += yShift + 0;
-				currentBlocks[1].x += xShift + -1;
-				currentBlocks[1].y += yShift + -1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + -1;
-				currentBlocks[0].turn = 4;
-				currentBlocks[1].turn = 4;
-				currentBlocks[2].turn = 4;
-				currentBlocks[3].turn = 4;
-				turned = true;
-			}
-		}
-		else if (currentBlocks[0].turn == 4) {
-			if ((screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift - 2] == 0 || screenBlocks[currentBlocks[0].x + xShift + 0][currentBlocks[0].y + yShift - 2] > 7)
-				&& (screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift - 1] == 0 || screenBlocks[currentBlocks[1].x + xShift + 1][currentBlocks[1].y + yShift - 1] > 7)
-				&& (screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] == 0 || screenBlocks[currentBlocks[2].x + xShift + 0][currentBlocks[2].y + yShift + 0] > 7)
-				&& (screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] == 0 || screenBlocks[currentBlocks[3].x + xShift + 1][currentBlocks[3].y + yShift + 1] > 7)
-				&& currentBlocks[0].y + yShift - 2 < 20 && currentBlocks[1].y + yShift - 1 < 20 && currentBlocks[2].y + yShift + 0 < 20 && currentBlocks[3].y + yShift + 1 < 20
-				&& currentBlocks[0].y + yShift - 2 >= 0 && currentBlocks[1].y + yShift - 1 >= 0 && currentBlocks[2].y + yShift + 0 >= 0 && currentBlocks[3].y + yShift + 1 >= 0
-				&& currentBlocks[0].x + xShift + 0 < 10 && currentBlocks[1].x + xShift + 1 < 10 && currentBlocks[2].x + xShift + 0 < 10 && currentBlocks[3].x + xShift + 1 < 10
-				&& currentBlocks[0].x + xShift + 0 >= 0 && currentBlocks[1].x + xShift + 1 >= 0 && currentBlocks[2].x + xShift + 0 >= 0 && currentBlocks[3].x + xShift + 1 >= 0) {
-				currentBlocks[0].x += xShift + 0;
-				currentBlocks[0].y += yShift + -2;
-				currentBlocks[1].x += xShift + 1;
-				currentBlocks[1].y += yShift + -1;
-				currentBlocks[2].x += xShift + 0;
-				currentBlocks[2].y += yShift + 0;
-				currentBlocks[3].x += xShift + 1;
-				currentBlocks[3].y += yShift + 1;
-				currentBlocks[0].turn = 1;
-				currentBlocks[1].turn = 1;
-				currentBlocks[2].turn = 1;
-				currentBlocks[3].turn = 1;
-				turned = true;
-			}
-		}
-	}
-	screenBlocks[currentBlocks[0].x][currentBlocks[0].y] = currentBlocks[0].type + 7;
-	screenBlocks[currentBlocks[1].x][currentBlocks[1].y] = currentBlocks[0].type + 7;
-	screenBlocks[currentBlocks[2].x][currentBlocks[2].y] = currentBlocks[0].type + 7;
-	screenBlocks[currentBlocks[3].x][currentBlocks[3].y] = currentBlocks[0].type + 7;
-    renderScreenBlocks[currentBlocks[0].x][currentBlocks[0].y]->changeColor(currentBlocks[0].type);
-    renderScreenBlocks[currentBlocks[1].x][currentBlocks[1].y]->changeColor(currentBlocks[1].type);
-    renderScreenBlocks[currentBlocks[2].x][currentBlocks[2].y]->changeColor(currentBlocks[2].type);
-    renderScreenBlocks[currentBlocks[3].x][currentBlocks[3].y]->changeColor(currentBlocks[3].type);
+    renderScreenBlocks[currentBlocks.location[0].x][currentBlocks.location[0].y]->setPieceType(currentBlocks.type);
+    renderScreenBlocks[currentBlocks.location[1].x][currentBlocks.location[1].y]->setPieceType(currentBlocks.type);
+    renderScreenBlocks[currentBlocks.location[2].x][currentBlocks.location[2].y]->setPieceType(currentBlocks.type);
+    renderScreenBlocks[currentBlocks.location[3].x][currentBlocks.location[3].y]->setPieceType(currentBlocks.type);
 	return turned;
 }
 
@@ -1441,7 +598,7 @@ void game::calculateNextBlocks(int startrange, int endrange) {
 			i--;
 		}
 		else {
-			nextBlock[i] = b;
+			nextBlock[i] = (tetrisBlock::pieceType)b;
 		}
 	}
 }
@@ -1450,7 +607,7 @@ void game::cycleNextBlocks() {
 	for (int i = 1; i < 14; i++) {
 		nextBlock[i - 1] = nextBlock[i];
 	}
-	nextBlock[13] = NULL;
+	nextBlock[13] = tetrisBlock::pieceType::Tile;
 	if (nextBlock[7] == NULL) {
 		calculateNextBlocks(7, 14);
 	}

@@ -15,7 +15,7 @@ int pieceType;
 public:
 tetrisPiece(ID2D1HwndRenderTarget* renderTarget, block::location setLocation, RECT screenSize);
 void resize(RECT screenSize);
-void changePiece(int type, RECT screenSize);
+void changePiece(tetrisBlock::pieceType type, RECT screenSize);
 void render();
 private:
 };

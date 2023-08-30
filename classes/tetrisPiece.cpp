@@ -75,13 +75,13 @@ void tetrisPiece::resize(RECT screenSize)
     }
 }
 
-void tetrisPiece::changePiece(int type, RECT screenSize)
+void tetrisPiece::changePiece(tetrisBlock::pieceType type, RECT screenSize)
 {
     pieceType = type;
-    pieces[0].changeColor(pieceType);
-    pieces[1].changeColor(pieceType);
-    pieces[2].changeColor(pieceType);
-    pieces[3].changeColor(pieceType);
+    pieces[0].setPieceType(type);
+    pieces[1].setPieceType(type);
+    pieces[2].setPieceType(type);
+    pieces[3].setPieceType(type);
     resize(screenSize);
 }
 
