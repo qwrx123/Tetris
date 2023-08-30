@@ -76,7 +76,7 @@ game::game(ID2D1HwndRenderTarget* renderTarget, IDWriteFactory* pDWriteFactory, 
     nextPieces{tetrisPiece(renderTarget, {0.42, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.54, 0.81, 0.13, 0.1}, screenSize),
     tetrisPiece(renderTarget, {0.66, 0.81, 0.13, 0.1}, screenSize)},
-	died(false), score(0), level(startingLevel), lines(0), effectGenerator(effectGenerator), holding(tetrisBlock::pieceType::Tile)
+	died(false), score(0), level(startingLevel), lines(0), effectGenerator(effectGenerator), holding(tetrisBlock::pieceType::Tile), ghostBlocks(startingPosistions[0])
 {
     for (int i = 0; i < 10; i++)
     {
